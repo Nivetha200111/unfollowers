@@ -52,7 +52,7 @@ class ApiService {
 
   // Auth endpoints
   async login(username: string, platform: string): Promise<ApiResponse<{ authUrl: string }>> {
-    const response = await this.api.post('/auth/login', { username, platform })
+    const response = await this.api.post('/auth/signin', { username, platform })
     return response.data
   }
 
