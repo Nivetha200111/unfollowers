@@ -13,22 +13,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   handleCors(req, res)
   if (req.method === 'OPTIONS') return
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
-    const body = callbackSchema.parse(req.body)
+    // Normalize input from GET query or POST body
+    const rawBody: any = typeof req.body === 'string'
+      ? (req.body ? JSON.parse(req.body) : {})
+      : (req.body || {})
+    const codeParam = (req.query?.code as string) ?? rawBody.code
+    const stateParam = (req.query?.state as string) ?? rawBody.state
+
+    const body = callbackSchema.parse({ code: codeParam, state: stateParam })
     const { code, state } = body
 
-    // Parse state to get platform
+    // Parse state to get platform (twitter-only)
     const [platform] = state.split('_')
-    
-    if (!['twitter', 'instagram', 'github'].includes(platform)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid platform in state'
-      })
+    if (platform !== 'twitter') {
+      return res.status(400).json({ success: false, error: 'Invalid platform in state' })
     }
 
     // Exchange code for access token
@@ -86,7 +89,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Authentication failed'
     })
