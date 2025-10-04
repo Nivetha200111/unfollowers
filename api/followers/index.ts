@@ -85,13 +85,16 @@ function generateMockFollowers(count: number) {
     const followerCount = Math.floor(Math.random() * 10000) + 10
     const followingCount = Math.floor(Math.random() * 5000) + 5
     const botScore = Math.random()
+    const now = new Date().toISOString()
+    const pastDate = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
     
     followers.push({
       id: `follower_${i}`,
+      userId: 'mock-user',
       platformId: `platform_${i}`,
       username,
-      displayName: username.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      bio: i % 3 === 0 ? 'This is a sample bio for demonstration purposes.' : null,
+      displayName: username.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
+      bio: i % 3 === 0 ? 'This is a sample bio for demonstration purposes.' : '',
       avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
       followerCount,
       followingCount,
@@ -99,8 +102,9 @@ function generateMockFollowers(count: number) {
       isPrivate: i % 5 === 0,
       isMutual: i % 4 === 0,
       botScore,
-      lastAnalyzed: new Date().toISOString(),
-      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
+      lastAnalyzed: now,
+      createdAt: pastDate,
+      updatedAt: now
     })
   }
 
