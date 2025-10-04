@@ -92,6 +92,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     console.error('Login API error:', error)
     console.error('Request body:', req.body)
+    console.error('ENV CHECK - TWITTER_CLIENT_ID exists:', !!process.env.TWITTER_CLIENT_ID)
+    console.error('ENV CHECK - TWITTER_CLIENT_SECRET exists:', !!process.env.TWITTER_CLIENT_SECRET)
     
     if (error instanceof z.ZodError) {
       return res.status(400).json({
@@ -101,9 +103,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     }
 
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error'
+    console.error('Sending error response:', errorMessage)
+    
     return res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined
     })
   }
 }
