@@ -31,6 +31,14 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = this.getToken()
     const user = this.getUser()
+    
+    // Reject mock tokens in production
+    if (token?.includes('mock-token')) {
+      console.warn('Mock token detected, clearing auth data')
+      this.clearAuthData()
+      return false
+    }
+    
     return !!(token && user)
   }
 
