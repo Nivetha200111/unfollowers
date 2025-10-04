@@ -15,7 +15,7 @@
   ],
   "functions": {
     "api/**/*.ts": {
-      "runtime": "@vercel/node",
+      "runtime": "@vercel/node@3",
       "maxDuration": 10,
       "memory": 1024
     }
