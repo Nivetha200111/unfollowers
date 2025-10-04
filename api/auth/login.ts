@@ -8,6 +8,8 @@ const loginSchema = z.object({
 })
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('[LOGIN v2.0] Starting login handler')
+  
   // Handle CORS
   handleCors(req, res)
   if (req.method === 'OPTIONS') return
