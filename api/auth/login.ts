@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 
-// Force rebuild - v4.0
+// v5.0 - Completely rebuilt without any dependencies
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    console.log('[LOGIN v3.0] Handler started')
+    console.log('[LOGIN v5.0] Handler started')
     console.log('[LOGIN] Request body:', req.body)
 
     // Parse body
