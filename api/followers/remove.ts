@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import { z } from 'zod'
-import { withAuth, handleCors, corsHeaders } from '../_middleware'
+import { withAuth, handleCors, corsHeaders } from '../_middleware.js'
 
 const removeSchema = z.object({
   followerIds: z.array(z.string()).min(1, 'At least one follower must be selected'),

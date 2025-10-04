@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
-import { handleCors, corsHeaders } from '../_middleware'
+import { handleCors, corsHeaders } from '../_middleware.js'
 
 async function handler(req: VercelRequest, res: VercelResponse) {
   // Handle CORS

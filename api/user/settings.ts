@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import { z } from 'zod'
-import { handleCors, corsHeaders } from '../_middleware'
+import { handleCors, corsHeaders } from '../_middleware.js'
 
 const settingsSchema = z.object({
   minFollowerThreshold: z.number().min(0).max(10000000).optional(),

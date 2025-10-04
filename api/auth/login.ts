@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import { z } from 'zod'
-import { handleCors, corsHeaders } from '../_middleware'
+import { handleCors, corsHeaders } from '../_middleware.js'
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),

@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
-import { withAuth, handleCors, corsHeaders } from '../_middleware'
+import { withAuth, handleCors, corsHeaders } from '../_middleware.js'
 
 async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('[FOLLOWERS] Request received:', req.method, req.url)
