@@ -3,6 +3,8 @@ export interface User {
   username: string
   platformId: string
   platform: 'twitter'
+  accessToken?: string
+  refreshToken?: string
   profileData?: {
     displayName?: string
     avatarUrl?: string
@@ -12,11 +14,13 @@ export interface User {
     isVerified?: boolean
   }
   createdAt: string
+  updatedAt: string
   lastLoginAt?: string
 }
 
 export interface Follower {
   id: string
+  userId: string
   platformId: string
   username: string
   displayName?: string
@@ -30,6 +34,7 @@ export interface Follower {
   botScore: number
   lastAnalyzed: string
   createdAt: string
+  updatedAt: string
 }
 
 export interface FollowerFilters {
@@ -50,6 +55,7 @@ export interface RemovalReason {
 
 export interface Removal {
   id: string
+  userId: string
   followerIds: string[]
   reason: string
   count: number
@@ -58,6 +64,7 @@ export interface Removal {
 
 export interface UserSettings {
   id: string
+  userId: string
   minFollowerThreshold: number
   maxFollowingRatio: number
   botDetectionEnabled: boolean
@@ -65,6 +72,8 @@ export interface UserSettings {
   emailNotifications: boolean
   removalConfirmations: boolean
   dataRetentionDays: number
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ApiResponse<T = any> {

@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
-import { localDatabase } from '../../src/lib/localDatabase'
+import { localDatabase } from '../src/lib/localDatabase'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
