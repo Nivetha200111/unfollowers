@@ -60,12 +60,16 @@ export class AuthService {
   async login(username: string, platform: string): Promise<{ authUrl: string }> {
     try {
       const response = await apiService.login(username, platform)
+      console.log('[AUTH] Login response:', response)
       if (response.success && response.data) {
         return response.data
       }
+      console.error('[AUTH] Login failed:', response)
       throw new Error(response.error || 'Login failed')
-    } catch (error) {
-      console.error('Login error:', error)
+    } catch (error: any) {
+      console.error('[AUTH] Login error:', error)
+      console.error('[AUTH] Error response:', error.response?.data)
+      console.error('[AUTH] Full error:', JSON.stringify(error, null, 2))
       throw error
     }
   }
