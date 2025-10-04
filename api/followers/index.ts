@@ -29,11 +29,11 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     
     console.log('[FOLLOWERS] Pagination:', { pageNum, limitNum })
 
-    // Check if this is a mock token (bypass auth)
+    // Check if this is a mock token (bypass auth) - only for development
     const authHeader = req.headers.authorization
-    const isMockAuth = authHeader?.includes('mock-token') || !authHeader
+    const isMockAuth = process.env.MOCK_AUTH === '1' && (!authHeader || authHeader?.includes('mock-token'))
     
-    console.log('[FOLLOWERS] Auth mode:', isMockAuth ? 'MOCK' : 'REAL')
+    console.log('[FOLLOWERS] Auth mode:', isMockAuth ? 'MOCK' : 'REAL', 'Auth header:', authHeader ? 'present' : 'missing')
 
     let followers: any[] = []
     let total = 0

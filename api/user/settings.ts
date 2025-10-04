@@ -18,14 +18,14 @@ async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return
 
   try {
-    // Check if this is a mock token (bypass auth)
+    // Check if this is a mock token (bypass auth) - only for development
     const authHeader = req.headers.authorization
-    const isMockAuth = authHeader?.includes('mock-token')
+    const isMockAuth = process.env.MOCK_AUTH === '1' && (!authHeader || authHeader?.includes('mock-token'))
 
     if (req.method === 'GET') {
       let settings
 
-      if (isMockAuth || !authHeader) {
+      if (isMockAuth) {
         // Return mock settings for testing
         console.log('[SETTINGS] Using mock settings')
         settings = {
@@ -62,7 +62,7 @@ async function handler(req: VercelRequest, res: VercelResponse) {
       // Update user settings
       const body = settingsSchema.parse(req.body)
       
-      if (isMockAuth || !authHeader) {
+      if (isMockAuth) {
         // Mock update - just return the updated settings
         console.log('[SETTINGS] Mock update')
         const settings = {

@@ -58,15 +58,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let authUrl = ''
 
-    // Twitter/X only. If credentials missing, fall back to local mock flow
-    const useMock = !process.env.TWITTER_CLIENT_ID || !process.env.TWITTER_CLIENT_SECRET || process.env.MOCK_AUTH === '1'
-    console.log('[LOGIN] Auth mode:', useMock ? 'MOCK' : 'REAL')
-    
-    if (useMock) {
-      authUrl = `${baseUrl}/api/auth/callback?code=mock_code&state=${state}`
-    } else {
-      authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${process.env.TWITTER_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20users.read%20follows.read%20follows.write&state=${state}`
+    // Twitter/X OAuth
+    if (!process.env.TWITTER_CLIENT_ID || !process.env.TWITTER_CLIENT_SECRET) {
+      console.error('[LOGIN] Missing Twitter credentials')
+      return res.status(500).json({
+        success: false,
+        error: 'Twitter API credentials not configured. Please set TWITTER_CLIENT_ID and TWITTER_CLIENT_SECRET in environment variables.'
+      })
     }
+    
+    console.log('[LOGIN] Using real Twitter OAuth')
+    authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${process.env.TWITTER_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20users.read%20follows.read%20follows.write&state=${state}`
 
     console.log('[LOGIN] Generated authUrl:', authUrl.substring(0, 100) + '...')
 

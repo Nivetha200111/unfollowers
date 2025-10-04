@@ -11,13 +11,13 @@ async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Check if this is a mock token (bypass auth)
+    // Check if this is a mock token (bypass auth) - only for development
     const authHeader = req.headers.authorization
-    const isMockAuth = authHeader?.includes('mock-token')
+    const isMockAuth = process.env.MOCK_AUTH === '1' && (!authHeader || authHeader?.includes('mock-token'))
 
     let user
 
-    if (isMockAuth || !authHeader) {
+    if (isMockAuth) {
       // Return mock user for testing
       console.log('[PROFILE] Using mock user')
       user = {

@@ -52,39 +52,9 @@ export function LoginPage() {
       setIsSubmitting(true)
       setError(null)
       
-      // Development bypass - if MOCK_AUTH is enabled, skip OAuth
-      if (import.meta.env.DEV || localStorage.getItem('BYPASS_AUTH') === 'true') {
-        console.log('Using bypass auth mode')
-        const mockUser = {
-          id: 'mock-user-' + Date.now(),
-          username: data.username,
-          platformId: '123456789',
-          platform: 'twitter' as const,
-          profileData: {
-            displayName: data.username,
-            avatarUrl: 'https://via.placeholder.com/150',
-            bio: 'Mock user for testing',
-            followerCount: 1500,
-            followingCount: 300,
-            isVerified: false,
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          lastLoginAt: new Date().toISOString(),
-        }
-        const mockToken = 'mock-token-' + Date.now()
-        
-        localStorage.setItem('user', JSON.stringify(mockUser))
-        localStorage.setItem('auth_token', mockToken)
-        
-        toast.success('Logged in with mock account!')
-        window.location.href = '/dashboard'
-        return
-      }
-      
       await login(data.username, data.platform)
       
-      toast.success('Redirecting to authentication...')
+      toast.success('Redirecting to Twitter authentication...')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed'
       setError(errorMessage)
@@ -149,19 +119,6 @@ export function LoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="mt-4 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                localStorage.setItem('BYPASS_AUTH', 'true')
-                toast.success('Bypass mode enabled! Login will skip OAuth.')
-              }}
-              className="text-xs text-muted-foreground hover:text-primary underline"
-            >
-              Enable Test Mode (Skip OAuth)
-            </button>
-          </div>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>
