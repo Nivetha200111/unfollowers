@@ -61,9 +61,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Twitter/X OAuth
     if (!process.env.TWITTER_CLIENT_ID || !process.env.TWITTER_CLIENT_SECRET) {
       console.error('[LOGIN] Missing Twitter credentials')
+      console.error('[LOGIN] TWITTER_CLIENT_ID exists:', !!process.env.TWITTER_CLIENT_ID)
+      console.error('[LOGIN] TWITTER_CLIENT_SECRET exists:', !!process.env.TWITTER_CLIENT_SECRET)
+      console.error('[LOGIN] All env keys:', Object.keys(process.env).filter(k => k.includes('TWITTER')))
       return res.status(500).json({
         success: false,
-        error: 'Twitter API credentials not configured. Please set TWITTER_CLIENT_ID and TWITTER_CLIENT_SECRET in environment variables.'
+        error: 'Twitter API credentials not configured. Please set TWITTER_CLIENT_ID and TWITTER_CLIENT_SECRET in environment variables.',
+        debug: {
+          clientIdExists: !!process.env.TWITTER_CLIENT_ID,
+          clientSecretExists: !!process.env.TWITTER_CLIENT_SECRET,
+          availableTwitterKeys: Object.keys(process.env).filter(k => k.includes('TWITTER'))
+        }
       })
     }
     
