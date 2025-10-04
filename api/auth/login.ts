@@ -22,16 +22,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? (req.body ? JSON.parse(req.body) : {})
       : (req.body || {})
 
-    // Try strict validation first; if it fails, coerce to twitter
-    let username: string
-    let platform: 'twitter'
-    try {
-      const parsed = loginSchema.parse(rawBody)
-      username = parsed.username
-      platform = parsed.platform
-    } catch {
-      username = String(rawBody.username || 'testuser')
-      platform = 'twitter'
+    // Force platform to twitter and validate username
+    const username = String(rawBody.username || 'testuser').trim()
+    const platform: 'twitter' = 'twitter'
+
+    // Basic username validation
+    if (!username || username.length < 3) {
+      res.status(400).json({
+        success: false,
+        error: 'Username must be at least 3 characters'
+      })
+      return
     }
 
     // Generate OAuth URL based on platform
@@ -66,19 +67,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
 
   } catch (error) {
-    console.error('Login error:', error)
+    console.error('Login API error:', error)
+    console.error('Request body:', req.body)
     
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid input',
+        error: 'Invalid input: ' + error.errors.map(e => e.message).join(', '),
         details: error.errors
       })
     }
 
     return res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: error instanceof Error ? error.message : 'Internal server error'
     })
   }
 }
