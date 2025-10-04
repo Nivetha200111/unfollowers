@@ -7,10 +7,8 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { LoadingSpinner } from '../components/ui/loading-spinner'
-import { PLATFORMS } from '../types'
-import { AlertCircle, CheckCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export function LoginPage() {
@@ -65,42 +63,24 @@ export function LoginPage() {
     }
   }
 
-  const platformInfo = PLATFORMS.twitter
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Welcome to Follower Manager</CardTitle>
           <CardDescription>
-            Connect your social media account to start managing your followers
+            Connect your X (Twitter) account to start managing your followers
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="platform">Platform</Label>
-              <Select
-                value={selectedPlatform}
-                onValueChange={(value) => setValue('platform', value as any)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a platform" />
-                </SelectTrigger>
-                <SelectContent>
-                  {platformOptions.map((platform) => (
-                    <SelectItem key={platform.value} value={platform.value}>
-                      <div className="flex items-center space-x-2">
-                        <span className={platform.color}>{platform.icon}</span>
-                        <span>{platform.label}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.platform && (
-                <p className="text-sm text-destructive">{errors.platform.message}</p>
-              )}
+              <div className="flex items-center space-x-2 p-3 border rounded-md bg-muted/50">
+                <span className="text-blue-500">𝕏</span>
+                <span className="font-medium">X (Twitter)</span>
+              </div>
+              <input type="hidden" {...register('platform')} value="twitter" />
             </div>
 
             <div className="space-y-2">
@@ -131,10 +111,10 @@ export function LoginPage() {
               {isSubmitting ? (
                 <div className="flex items-center space-x-2">
                   <LoadingSpinner size="sm" />
-                  <span>Connecting...</span>
+                  <span>Connecting to X...</span>
                 </div>
               ) : (
-                'Connect Account'
+                'Connect X Account'
               )}
             </Button>
           </form>
