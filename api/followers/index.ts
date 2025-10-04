@@ -2,11 +2,23 @@ import { VercelRequest, VercelResponse } from '@vercel/node'
 import { withAuth, handleCors, corsHeaders } from '../_middleware'
 
 async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('[FOLLOWERS] Request received:', req.method, req.url)
+  console.log('[FOLLOWERS] Headers:', req.headers.authorization ? 'Auth present' : 'No auth')
+  
   // Handle CORS
-  handleCors(req, res)
-  if (req.method === 'OPTIONS') return
+  try {
+    handleCors(req, res)
+  } catch (e) {
+    console.error('[FOLLOWERS] CORS error:', e)
+  }
+  
+  if (req.method === 'OPTIONS') {
+    console.log('[FOLLOWERS] OPTIONS request - returning')
+    return res.status(200).end()
+  }
 
   if (req.method !== 'GET') {
+    console.log('[FOLLOWERS] Invalid method:', req.method)
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
@@ -14,39 +26,52 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     const { page = 1, limit = 50 } = req.query
     const pageNum = parseInt(page as string, 10)
     const limitNum = parseInt(limit as string, 10)
+    
+    console.log('[FOLLOWERS] Pagination:', { pageNum, limitNum })
 
     // Check if this is a mock token (bypass auth)
     const authHeader = req.headers.authorization
-    const isMockAuth = authHeader?.includes('mock-token')
+    const isMockAuth = authHeader?.includes('mock-token') || !authHeader
+    
+    console.log('[FOLLOWERS] Auth mode:', isMockAuth ? 'MOCK' : 'REAL')
 
-    let followers = []
+    let followers: any[] = []
     let total = 0
 
-    if (isMockAuth || !authHeader) {
-      // Generate mock followers for testing
-      console.log('[FOLLOWERS] Using mock data')
-      const allMockFollowers = generateMockFollowers(100)
-      const start = (pageNum - 1) * limitNum
-      const end = start + limitNum
-      followers = allMockFollowers.slice(start, end)
-      total = allMockFollowers.length
-    } else {
-      // Real auth - use database
-      console.log('[FOLLOWERS] Using real database')
-      const { localDatabase } = await import('../../src/lib/localDatabase')
-      const userId = (req as any).user?.id || 'mock-user'
-      const result = await localDatabase.getFollowers(userId, pageNum, limitNum)
-      followers = result.data
-      total = result.total
+    try {
+      if (isMockAuth) {
+        // Generate mock followers for testing
+        console.log('[FOLLOWERS] Generating mock data...')
+        const allMockFollowers = generateMockFollowers(100)
+        console.log('[FOLLOWERS] Generated', allMockFollowers.length, 'mock followers')
+        const start = (pageNum - 1) * limitNum
+        const end = start + limitNum
+        followers = allMockFollowers.slice(start, end)
+        total = allMockFollowers.length
+        console.log('[FOLLOWERS] Returning', followers.length, 'followers for page', pageNum)
+      } else {
+        // Real auth - use database
+        console.log('[FOLLOWERS] Loading from database...')
+        const { localDatabase } = await import('../../src/lib/localDatabase')
+        const userId = (req as any).user?.id || 'mock-user'
+        const result = await localDatabase.getFollowers(userId, pageNum, limitNum)
+        followers = result.data
+        total = result.total
+      }
+    } catch (dataError) {
+      console.error('[FOLLOWERS] Data generation error:', dataError)
+      throw dataError
     }
     
     const totalPages = Math.ceil(total / limitNum)
     
-    res.setHeader('Access-Control-Allow-Origin', corsHeaders()['Access-Control-Allow-Origin'])
-    res.setHeader('Access-Control-Allow-Methods', corsHeaders()['Access-Control-Allow-Methods'])
-    res.setHeader('Access-Control-Allow-Headers', corsHeaders()['Access-Control-Allow-Headers'])
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     
-    res.status(200).json({
+    console.log('[FOLLOWERS] Sending success response')
+    
+    return res.status(200).json({
       success: true,
       data: {
         data: followers,
@@ -62,10 +87,12 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     })
 
   } catch (error) {
-    console.error('[FOLLOWERS] Error:', error)
-    res.status(500).json({
+    console.error('[FOLLOWERS] Fatal error:', error)
+    console.error('[FOLLOWERS] Error stack:', error instanceof Error ? error.stack : 'No stack')
+    return res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch followers'
+      error: error instanceof Error ? error.message : 'Failed to fetch followers',
+      details: error instanceof Error ? error.stack : String(error)
     })
   }
 }
