@@ -12,6 +12,7 @@ import { AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export function LoginPage() {
+  // X (Twitter) only - Instagram removed
   const { login, isLoading } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
