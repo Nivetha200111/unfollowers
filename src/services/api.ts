@@ -52,12 +52,12 @@ class ApiService {
 
   // Auth endpoints
   async login(username: string, platform: string): Promise<ApiResponse<{ authUrl: string }>> {
-    const response = await this.api.post('/auth/signin', { username, platform })
+    const response = await this.api.post('/v2/login', { username, platform })
     return response.data
   }
 
   async handleCallback(code: string, state: string): Promise<ApiResponse<{ user: User; token: string }>> {
-    const response = await this.api.post('/auth/callback', { code, state })
+    const response = await this.api.post('/v2/callback', { code, state })
     return response.data
   }
 
