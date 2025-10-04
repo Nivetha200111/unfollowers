@@ -1,11 +1,10 @@
 export default async function handler(req: any, res: any) {
   try {
-    // Only allow with secret key
-    const hasSecret = req.query.secret === process.env.JWT_SECRET
-    
-    if (!hasSecret) {
-      return res.status(403).json({ error: 'Forbidden - invalid secret' })
-    }
+    // Temporarily public for debugging - REMOVE THIS IN PRODUCTION
+    // const hasSecret = req.query.secret === process.env.JWT_SECRET
+    // if (!hasSecret) {
+    //   return res.status(403).json({ error: 'Forbidden - invalid secret' })
+    // }
 
     const diagnostics = {
       timestamp: new Date().toISOString(),
