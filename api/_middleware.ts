@@ -56,9 +56,7 @@ export function withAuth(handler: (req: AuthenticatedRequest, res: VercelRespons
 
 export function corsHeaders() {
   return {
-    'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' 
-      ? 'https://your-domain.vercel.app' 
-      : '*',
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400'

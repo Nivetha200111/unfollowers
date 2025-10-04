@@ -4,7 +4,7 @@ import { handleCors, corsHeaders } from '../_middleware'
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
-  platform: z.enum(['twitter', 'instagram', 'github'])
+  platform: z.literal('twitter')
 })
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -17,7 +17,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const body = loginSchema.parse(req.body)
+    // Vercel may provide body as string or object; normalize it
+    const rawBody: any = typeof req.body === 'string'
+      ? (req.body ? JSON.parse(req.body) : {})
+      : (req.body || {})
+
+    const body = loginSchema.parse(rawBody)
     const { username, platform } = body
 
     // Generate OAuth URL based on platform
@@ -30,25 +35,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let authUrl = ''
 
-    switch (platform) {
-      case 'twitter':
-        authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${process.env.TWITTER_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20users.read%20follows.read%20follows.write&state=${state}`
-        break
-      
-      case 'instagram':
-        authUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code&state=${state}`
-        break
-      
-      case 'github':
-        authUrl = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=read:user,user:follow&state=${state}`
-        break
-      
-      default:
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Unsupported platform' 
-        })
+    // Twitter/X only
+    if (!process.env.TWITTER_CLIENT_ID) {
+      return res.status(500).json({
+        success: false,
+        error: 'Missing TWITTER_CLIENT_ID'
+      })
     }
+    authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${process.env.TWITTER_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=tweet.read%20users.read%20follows.read%20follows.write&state=${state}`
 
     // Store state temporarily (in production, use Redis or database)
     // For now, we'll include it in the response
@@ -75,7 +69,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       })
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error'
     })
