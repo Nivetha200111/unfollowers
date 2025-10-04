@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 
+// Force rebuild - v4.0
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
